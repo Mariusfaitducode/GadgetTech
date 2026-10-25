@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Métronome – partez pile à l'heure</title>
+  <meta name="description" content="Un cadre en noyer à écran e-ink qui vous dit quand quitter la maison pour attraper le prochain métro. Une invention d'Aywen, à fabriquer soi-même : composants, fichiers 3D, câblage et code.">
+  <meta property="og:title" content="Métronome – partez pile à l'heure">
+  <meta property="og:description" content="L'objet qui vous dit quand partir pour attraper le prochain métro.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:image" content="https://metronome-surleradar.vercel.app/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#000000">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="chev" viewBox="0 0 8 14"><path d="M1.5 1.5 6.5 7l-5 5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor"/></symbol>
+    <symbol id="dl" viewBox="0 0 20 20"><path d="M10 3v10m0 0-4-4m4 4 4-4M4 16h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+  <a class="skip" href="#temps">Aller au contenu</a>
+
+  <header class="localnav" id="localnav">
+    <div class="ln-inner">
+      <a class="ln-title" href="#apercu">Métronome</a>
+      <nav aria-label="Sections">
+        <a href="#points">Points forts</a>
+        <a href="#essai">Essayer</a>
+        <a href="#fabriquer">Fabriquer</a>
+        <a href="#questions">Questions</a>
+      </nav>
+      <a class="pill pill-sm" href="#liste">Je le veux</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Séquence épinglée : l'objet se tourne vers vous, puis l'écran remplit l'image -->
+    <section class="stage" id="apercu" aria-labelledby="stage-title">
+      <div class="stage-pin">
+        <div class="stage-3d" id="stage-3d" aria-hidden="true"></div>
+        <div class="stage-intro">
+          <h1 id="stage-title">Métronome</h1>
+          <p class="stage-tag">Partez pile à l'heure.</p>
+          <div class="cta-row">
+            <a class="pill" href="#liste">Je le veux tout fait</a>
+            <a class="more more-dark" href="#fabriquer">Le fabriquer soi‑même<svg aria-hidden="true"><use href="#chev"/></svg></a>
+          </div>
+        </div>
+        <ol class="stage-captions" aria-label="Comment il fonctionne">
+          <li>Il suit les passages en temps réel.</li>
+          <li>Il retire votre temps de marche.</li>
+          <li>Et n'affiche qu'une chose&nbsp;: quand partir.</li>
+        </ol>
+        <p class="stage-note">Une invention d'Aywen</p>
+      </div>
+    </section>
+
+    <!-- Le problème, chiffré -->
+    <section class="temps" id="temps">
+      <div class="wrap narrow">
+        <h2 class="h-xl">Huit minutes sur le quai.<br>Deux fois par jour.</h2>
+        <p class="lead">Vous descendez l'escalier, l'afficheur annonce le prochain métro dans 8&nbsp;minutes. Vous auriez pu les passer chez vous. Une fois, ce n'est rien. Toute l'année, ça finit par compter.</p>
+      </div>
+      <div class="wrap calc">
+        <p class="calc-out" aria-live="polite">Ça fait <strong id="hours">50&nbsp;heures</strong> par an.<sup><a href="#fn1" id="fnref1">1</a></sup></p>
+        <div class="calc-inputs">
+          <label class="range"><span>Attente moyenne</span><output data-for="wait">5 min</output><input type="range" id="wait" min="1" max="12" value="5"></label>
+          <label class="range"><span>Trajets par jour</span><output data-for="trips">2</output><input type="range" id="trips" min="1" max="6" value="2"></label>
+          <label class="range"><span>Jours de métro par an</span><output data-for="days">300</output><input type="range" id="days" min="50" max="365" step="5" value="300"></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Points forts -->
+    <section class="points" id="points">
+      <div class="wrap">
+        <h2 class="h-lg">Pensé pour l'entrée.</h2>
+        <div class="bento">
+          <article class="tile t-screen">
+            <div class="t-copy">
+              <h3>Encre électronique.</h3>
+              <p>Lisible depuis le couloir, sans rétroéclairage ni reflet. L'écran garde son image sans courant et ne consomme que lorsqu'elle change.</p>
+            </div>
+            <div class="t-screen-frame"><canvas id="tile-screen" width="800" height="600" aria-label="Écran e-ink affichant le temps avant de partir"></canvas></div>
+          </article>
+
+          <article class="tile t-wood" id="t-wood">
+            <h3>Noyer massif.</h3>
+            <p>Coque taillée par un sculpteur à partir du fichier 3D, polie puis vernie. Ou imprimée en PLA, si vous préférez.</p>
+          </article>
+
+          <article class="tile t-cells">
+            <svg class="t-icon" viewBox="0 0 120 64" aria-hidden="true">
+              <g fill="none" stroke="currentColor" stroke-width="2.4">
+                <rect x="6" y="6" width="96" height="14" rx="4"/><rect x="6" y="25" width="96" height="14" rx="4"/><rect x="6" y="44" width="96" height="14" rx="4"/>
+              </g>
+              <g fill="currentColor"><rect x="104" y="10" width="6" height="6" rx="1.5"/><rect x="104" y="29" width="6" height="6" rx="1.5"/><rect x="104" y="48" width="6" height="6" rx="1.5"/></g>
+            </svg>
+            <h3>Trois piles AAA.</h3>
+            <p>Pas de câble au mur, pas de batterie à recharger. L'ESP32 dort entre deux mises à jour.</p>
+          </article>
+
+          <article class="tile t-dark t-magnet">
+            <svg class="t-icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 10h12v24a6 6 0 0 0 12 0V10h12v24a18 18 0 0 1-36 0Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M14 20h12M38 20h12" stroke="currentColor" stroke-width="2.4"/></svg>
+            <h3>Aucune vis.</h3>
+            <p>Des aimants referment la coque. On l'ouvre d'un geste pour changer les piles.</p>
+          </article>
+
+          <article class="tile t-dims">
+            <svg class="dims" viewBox="0 0 230 160" aria-hidden="true">
+              <rect x="14" y="30" width="150" height="112" rx="16" fill="none" stroke="currentColor" stroke-width="2"/>
+              <rect x="42" y="52" width="94" height="68" rx="7" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/>
+              <rect x="190" y="30" width="20" height="112" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
+              <g stroke="currentColor" stroke-width="1" opacity=".5"><path d="M14 16h150M14 12v8M164 12v8M190 16h20M190 12v8M210 12v8"/></g>
+              <g font-family="Inter, sans-serif" font-size="11" fill="currentColor" text-anchor="middle"><text x="89" y="10">130 mm</text><text x="200" y="10">35</text></g>
+            </svg>
+            <h3>35&nbsp;mm d'épaisseur.</h3>
+            <p>130 × 100&nbsp;mm de façade. Assez fin pour se faire oublier sur un mur.</p>
+          </article>
+          <article class="tile t-lines">
+            <h3>Toute l'Île‑de‑France.</h3>
+            <p>Métro, RER, bus, tram et Transilien, grâce aux horaires en temps réel publiés par Île‑de‑France Mobilités.</p>
+            <ul class="roundels" aria-label="Les 14 lignes de métro">
+              <li style="--c:#FFCD00;--t:#1d1d1f">1</li><li style="--c:#003CA6">2</li><li style="--c:#837902">3</li><li style="--c:#CF009E">4</li><li style="--c:#FF7E2E;--t:#1d1d1f">5</li><li style="--c:#6ECA97;--t:#1d1d1f">6</li><li style="--c:#FA9ABA;--t:#1d1d1f">7</li><li style="--c:#E19BDF;--t:#1d1d1f">8</li><li style="--c:#B6BD00;--t:#1d1d1f">9</li><li style="--c:#C9910D;--t:#1d1d1f">10</li><li style="--c:#704B1C">11</li><li style="--c:#007852">12</li><li style="--c:#6EC4E8;--t:#1d1d1f">13</li><li style="--c:#62259D">14</li>
+            </ul>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Vue éclatée -->
+    <section class="objet" id="objet">
+      <div class="objet-sticky"><div class="objet-3d" id="exploded-3d" aria-hidden="true"></div></div>
+      <div class="wrap objet-copy">
+        <h2 class="h-lg">Six pièces.<br>Rien de plus.</h2>
+        <ol class="parts" id="parts">
+          <li data-part="cadre"><h3>Cadre en noyer</h3><p>Une fenêtre aux angles arrondis qui encadre l'écran.</p></li>
+          <li data-part="ecran"><h3>Écran e‑ink 4,2"</h3><p>400 × 300 pixels, noir et blanc. Il garde son image sans courant.</p></li>
+          <li data-part="esp32"><h3>ESP32</h3><p>Le microcontrôleur Wi‑Fi. Il récupère les passages, calcule l'heure de départ, puis se rendort.</p></li>
+          <li data-part="piles"><h3>3 piles AAA</h3><p>4,5&nbsp;V en série, ramenés à 3,3&nbsp;V par le régulateur de l'ESP32.</p></li>
+          <li data-part="aimants"><h3>Aimants</h3><p>Quatre pastilles de néodyme, collées par paires.</p></li>
+          <li data-part="coque"><h3>Coque en noyer</h3><p>Massive, polie, vernie. Elle accueille les piles et l'électronique.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Simulateur -->
+    <section class="essai" id="essai">
+      <div class="wrap">
+        <h2 class="h-lg">Essayez‑le.</h2>
+        <p class="lead lead-center">Choisissez une station et votre temps de marche. L'écran fait le calcul.<sup><a href="#fn2" id="fnref2">2</a></sup></p>
+        <div class="sim">
+          <div class="sim-device"><canvas id="sim-screen" width="800" height="600" aria-label="Écran du Métronome"></canvas></div>
+          <div class="sim-controls">
+            <div class="segmented" role="radiogroup" aria-label="Station" id="station">
+              <label><input type="radio" name="station" value="nation" checked><span><i class="dot" style="--c:#FFCD00;--t:#1d1d1f">1</i>Nation</span></label>
+              <label><input type="radio" name="station" value="clichy"><span><i class="dot" style="--c:#003CA6">2</i>Place de Clichy</span></label>
+              <label><input type="radio" name="station" value="chatelet"><span><i class="dot" style="--c:#62259D">14</i>Châtelet</span></label>
+            </div>
+            <label class="range range-wide"><span>Temps de marche jusqu'à la station</span><output data-for="walk">5 min</output><input type="range" id="walk" min="1" max="15" value="5"></label>
+            <p class="sim-read" id="sim-read" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Film -->
+    <section class="film" id="film">
+      <div class="wrap">
+        <h2 class="h-lg">De l'idée à l'objet.</h2>
+        <p class="lead lead-center">Le prototype imprimé, la coque taillée par un sculpteur, le code, puis les normes qui empêchent de le vendre&nbsp;: tout est dans la vidéo d'Aywen.</p>
+        <button class="yt" id="yt" type="button" aria-label="Lire la vidéo : J'ai inventé un objet tech qui n'existait pas">
+          <img src="https://i.ytimg.com/vi/4oJ5NzMS_1s/maxresdefault.jpg" alt="" loading="lazy">
+          <span class="yt-play"><svg aria-hidden="true"><use href="#play"/></svg>Regarder le film<span class="yt-dur">18 min</span></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Fabriquer -->
+    <section class="fabriquer" id="fabriquer">
+      <div class="wrap">
+        <h2 class="h-xl">Fabriquez le vôtre.</h2>
+        <p class="lead lead-center">Les plans, les fichiers 3D, le câblage et le code sont publics. Il faut deux soudures et huit fils.</p>
+
+        <h3 class="h-md">Ce qu'il vous faut.</h3>
+        <ul class="kit">
+          <li><img src="assets/img/c-esp32.webp" alt="" loading="lazy"><h4>ESP32 DevKit</h4><p>WROOM‑32</p><a href="https://link.amazon/B05PhsXXk" target="_blank" rel="noopener sponsored">Acheter<span class="sr"> l'ESP32</span></a></li>
+          <li><img src="assets/img/c-epaper.webp" alt="" loading="lazy"><h4>Écran e‑paper 4,2"</h4><p>Waveshare, SPI</p><a href="https://link.amazon/B0hUeOfkp" target="_blank" rel="noopener sponsored">Acheter<span class="sr"> l'écran</span></a></li>
+          <li><img src="assets/img/c-holder.webp" alt="" loading="lazy"><h4>Support 3 × AAA</h4><p>Avec fils</p><a href="https://link.amazon/B0dGkyPKi" target="_blank" rel="noopener sponsored">Acheter<span class="sr"> le support</span></a></li>
+          <li><img src="assets/img/c-batteries.webp" alt="" loading="lazy"><h4>3 piles AAA</h4><p>Alcalines 1,5&nbsp;V</p><a href="https://link.amazon/B00DqTe5N" target="_blank" rel="noopener sponsored">Acheter<span class="sr"> les piles</span></a></li>
+          <li><img src="assets/img/c-magnets.webp" alt="" loading="lazy"><h4>Aimants néodyme</h4><p>4 à 8 pastilles</p><a href="https://link.amazon/B03dAMWBj" target="_blank" rel="noopener sponsored">Acheter<span class="sr"> les aimants</span></a></li>
+          <li><img src="assets/img/c-walnut.webp" alt="" loading="lazy"><h4>Coque et cadre</h4><p>Noyer ou PLA</p><a href="#etape-1">Fichiers 3D</a></li>
+        </ul>
+        <p class="tools">Côté outils&nbsp;: <a href="https://link.amazon/B09agcx81" target="_blank" rel="noopener sponsored">fer à souder</a>, <a href="https://link.amazon/B0bbIxa1c" target="_blank" rel="noopener sponsored">pistolet à colle chaude</a>, <a href="https://link.amazon/B0iElBAMQ" target="_blank" rel="noopener sponsored">colle forte</a> et <a href="https://link.amazon/B03tXfXY4" target="_blank" rel="noopener sponsored">vernis teinte noyer</a>. Les liens d'achat sont affiliés.<sup><a href="#fn3" id="fnref3">3</a></sup></p>
+
+        <h3 class="h-md">Le montage, étape par étape.</h3>
+        <p class="caution">Ce montage demande des bases en électronique. Une erreur de branchement peut griller un composant, voire provoquer un départ de feu. Vous le réalisez sous votre seule responsabilité.</p>
+
+        <div class="steps" id="steps">
+          <div class="steps-track" aria-hidden="true"><div class="steps-fill" id="steps-fill"></div></div>
+
+          <article class="step" id="etape-1">
+            <h4><span class="n">1</span>Faire la coque</h4>
+            <p>La forme est libre&nbsp;: elle doit contenir l'écran, les piles et l'ESP32. Imprimez-la en 3D, faites-la tailler dans du bois comme l'original, ou recyclez une petite boîte.</p>
+            <div class="files">
+              <a class="file" href="assets/stl/metronome-coque.stl" download><svg aria-hidden="true"><use href="#dl"/></svg><span>Coque<small>STL, 130 × 100 × 27,5 mm</small></span></a>
+              <a class="file" href="assets/stl/metronome-coque-ecran.stl" download><svg aria-hidden="true"><use href="#dl"/></svg><span>Cadre de l'écran<small>STL, 130 × 100 × 7,5 mm</small></span></a>
+            </div>
+            <div class="duo">
+              <img src="assets/img/s-print.webp" alt="Prototype de la coque imprimé en plastique blanc" loading="lazy">
+              <img src="assets/img/s-varnish.webp" alt="Coque en noyer vernie au pinceau" loading="lazy">
+            </div>
+            <p>Pour fermer sans vis, collez un aimant dans le couvercle et un en face dans la coque. Vérifiez qu'ils s'attirent avant que la colle prenne.</p>
+          </article>
+
+          <article class="step">
+            <h4><span class="n">2</span>Souder l'alimentation</h4>
+            <ol class="sub">
+              <li>Fil rouge (+) du support de piles sur la broche <code>VIN</code> de l'ESP32. Jamais sur <code>3V3</code>&nbsp;: 4,5&nbsp;V, c'est trop pour elle.</li>
+              <li>Fil noir (−) sur une broche <code>GND</code>.</li>
+              <li>Mettez les piles. Si la LED de l'ESP32 s'allume, l'alimentation est bonne.</li>
+            </ol>
+            <p class="note">Retirez toujours les piles avant de brancher l'ESP32 en USB.</p>
+          </article>
+
+          <article class="step">
+            <h4><span class="n">3</span>Brancher l'écran</h4>
+            <p>Huit fils relient l'écran à l'ESP32. Survolez ou touchez une ligne du tableau pour voir le fil correspondant. Si les couleurs de votre nappe diffèrent, fiez-vous au nom des broches.</p>
+            <div class="wiring">
+              <svg id="wiring-svg" viewBox="0 0 668 360" role="img" aria-label="Schéma de câblage entre l'ESP32 et l'écran e-paper"></svg>
+              <table class="pins" id="pins">
+                <thead><tr><th scope="col">Fil</th><th scope="col">Écran</th><th scope="col">ESP32</th><th scope="col">Rôle</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <p class="note">Le brochage peut changer d'une version d'écran à l'autre. Vérifiez dans le manuel du vôtre avant de brancher.</p>
+          </article>
+
+          <article class="step">
+            <h4><span class="n">4</span>Installer le code</h4>
+            <ol class="sub">
+              <li>Installez l'<a href="https://www.arduino.cc/en/software" target="_blank" rel="noopener">IDE Arduino</a> et le support des cartes esp32 (Espressif).</li>
+              <li>Ajoutez les bibliothèques <code>GxEPD2</code>, <code>Adafruit GFX</code>, <code>ArduinoJson</code> (v7), <code>WiFiManager</code> et <code>wolfssl</code>.</li>
+              <li>Activez le SNI dans wolfSSL, exigé par le serveur PRIM&nbsp;: ajoutez <code>#define HAVE_SNI</code> dans <code>user_settings.h</code>.</li>
+              <li>Ouvrez <code>ProchainMetro.ino</code>, choisissez la carte « ESP32 Dev Module » et la partition « Minimal SPIFFS », puis téléversez.</li>
+            </ol>
+            <a class="more" href="https://github.com/Volko61/GadgetTech" target="_blank" rel="noopener">Voir le code sur GitHub<svg aria-hidden="true"><use href="#chev"/></svg></a>
+          </article>
+
+          <article class="step">
+            <h4><span class="n">5</span>Configurer sa station</h4>
+            <ol class="sub">
+              <li>Créez un compte gratuit sur <a href="https://prim.iledefrance-mobilites.fr" target="_blank" rel="noopener">PRIM</a> et générez une clé d'API.</li>
+              <li>Allumez l'objet&nbsp;: l'écran affiche un QR code. Scannez-le pour rejoindre son réseau Wi‑Fi et choisir le vôtre.</li>
+              <li>Un second QR code ouvre les réglages&nbsp;: station, ligne, terminus et temps de marche.</li>
+            </ol>
+            <p>L'écran se met ensuite à jour chaque minute, la météo tous les quarts d'heure.</p>
+          </article>
+
+          <article class="step">
+            <h4><span class="n">6</span>Tout ranger</h4>
+            <p>Piles et ESP32 au fond de la coque, écran contre la fenêtre avec un peu de colle chaude sur les bords du cadre. Laissez du mou dans les fils pour pouvoir rouvrir, et refermez.</p>
+            <p class="note">Jamais de colle chaude directement sur l'ESP32 ou sur la nappe de l'écran.</p>
+          </article>
+
+          <article class="step">
+            <h4><span class="n">7</span>Changer de réglages, si besoin</h4>
+            <p>Nouveau Wi‑Fi, nouvelle station&nbsp;? Ouvrez la coque, retirez les piles, branchez l'ESP32 en USB‑C et refaites les étapes 4 et 5.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Liste d'attente -->
+    <section class="liste" id="liste">
+      <div class="wrap narrow">
+        <h2 class="h-xl">Vous le voudriez tout fait&nbsp;?</h2>
+        <p class="lead">Métronome n'est pas vendu&nbsp;: marquage CE, tests en laboratoire et séries minimum de 1&nbsp;000 pièces le rendent difficile à produire. Dites-le si vous l'achèteriez. C'est ce qui permettra de savoir si une petite série a du sens.</p>
+        <form class="wait" id="wait-form" novalidate>
+          <label class="sr" for="email">Adresse email</label>
+          <div class="field">
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Adresse email" aria-describedby="wait-msg" required>
+            <button class="pill" type="submit">M'inscrire</button>
+          </div>
+          <p class="wait-msg" id="wait-msg" aria-live="polite">Démonstration&nbsp;: aucune adresse n'est enregistrée.<sup><a href="#fn4">4</a></sup></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Questions -->
+    <section class="questions" id="questions">
+      <div class="wrap narrow">
+        <h2 class="h-lg">Questions.</h2>
+        <details><summary>Je peux l'acheter tout fait&nbsp;?</summary><p>Pas aujourd'hui. Vendre un objet électronique en Europe impose le marquage CE, des tests en laboratoire, une filière de recyclage, et les usines demandent souvent 1&nbsp;000 unités minimum. Aywen a préféré publier les plans. Inscrivez-vous plus haut si vous le voudriez tout fait.</p></details>
+        <details><summary>Ça marche en dehors de Paris&nbsp;?</summary><p>Partout en Île‑de‑France, pour tout ce que publie PRIM&nbsp;: métro, RER, bus, tram et Transilien. Ailleurs, il faudrait adapter le code à l'API du réseau local.</p></details>
+        <details><summary>Combien de temps tiennent les piles&nbsp;?</summary><p>L'écran ne consomme que lorsqu'il change et l'ESP32 dort entre deux mises à jour. L'autonomie réelle n'est pas encore mesurée&nbsp;; Aywen donnera son retour d'usage sur Instagram.</p></details>
+        <details><summary>Faut-il savoir programmer&nbsp;?</summary><p>Non, le code est prêt&nbsp;: il suffit de le téléverser. Il faut en revanche savoir souder deux fils et brancher une nappe sans se tromper de broche.</p></details>
+        <details><summary>Je peux suivre deux lignes&nbsp;?</summary><p>Oui. Les réglages permettent de choisir ses terminus, et la vidéo montre une configuration à plusieurs métros, pratique quand on ne part pas dans la même direction.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <ol class="footnotes">
+        <li id="fn1">Calcul d'Aywen dans la vidéo&nbsp;: 5&nbsp;minutes d'attente, deux fois par jour, 300&nbsp;jours par an. Modifiez les curseurs pour votre cas.</li>
+        <li id="fn2">Simulation avec des horaires fictifs. L'objet, lui, interroge en temps réel l'API PRIM d'Île‑de‑France Mobilités.</li>
+        <li id="fn3">Les liens d'achat sont des liens affiliés Amazon. Ils soutiennent le projet sans rien vous coûter de plus.</li>
+        <li id="fn4">Formulaire de démonstration, non relié&nbsp;: rien n'est envoyé ni stocké.</li>
+      </ol>
+      <p>Métronome est une invention d'Aywen, développée par Volko. Données de transport issues de la plateforme PRIM d'Île‑de‑France Mobilités. Métronome n'est ni affilié à, ni approuvé par Île‑de‑France Mobilités ou la RATP. Le montage décrit ici est réalisé sous la seule responsabilité de la personne qui l'entreprend.</p>
+      <div class="foot-bar">
+        <span>Proposition de refonte non officielle, réalisée par <a href="https://surleradar.com" target="_blank" rel="noopener">Sur Le Radar</a>.</span>
+        <nav aria-label="Liens"><a href="https://youtu.be/4oJ5NzMS_1s" target="_blank" rel="noopener">La vidéo</a><a href="https://github.com/Volko61/GadgetTech" target="_blank" rel="noopener">Le code</a><a href="https://metronome.aywen.fr" target="_blank" rel="noopener">Site d'origine</a></nav>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
